@@ -1,7 +1,9 @@
+package estimations
+
 import kotlin.test.Test
 import kotlin.test.fail
 
-class NormalParametersTest {
+class ExponentialParametersTest {
 
     @Test
     fun estimate() {
