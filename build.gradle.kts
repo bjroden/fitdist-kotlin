@@ -14,6 +14,7 @@ repositories {
 }
 
 dependencies {
+    implementation("io.github.rossetti:KSLCore:R1.0.1")
     testImplementation(kotlin("test"))
 }
 
