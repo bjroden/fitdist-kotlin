@@ -1,12 +1,12 @@
 package estimations
 
 import kotlin.test.Test
-import kotlin.test.fail
 
 class PoissonParametersTest {
 
     @Test
     fun estimate() {
-        fail("Not yet implemented")
+        val result = PoissonParameters().estimate(Data.groundBeef)
+        assert(result.isFailure) { "Estimation should have failed due to non-integer data, was a success" }
     }
 }
