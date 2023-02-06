@@ -1,7 +1,12 @@
 package estimations
 
+import ksl.utilities.statistic.Statistic
+import org.apache.commons.math3.stat.descriptive.moment.Variance
+
 class NormalParameters : ParameterEstimatorIfc {
     override fun estimate(data: DoubleArray): Result<DoubleArray> {
-        TODO("Not yet implemented")
+        val mean = Statistic(data).average
+        val variance = Variance(false).evaluate(data)
+        return estimateSuccess(mean, variance)
     }
 }
