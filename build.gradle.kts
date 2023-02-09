@@ -15,6 +15,7 @@ repositories {
 
 dependencies {
     implementation("io.github.rossetti:KSLCore:R1.0.1")
+    implementation("org.apache.commons:commons-numbers-gamma:1.1")
     testImplementation(kotlin("test"))
 }
 
