@@ -7,7 +7,7 @@ class WeibullParameters : ParameterEstimatorIfc {
     //TODO: replace sumOf with more computationally stable method (and maybe pow if needed)
     override fun estimate(data: DoubleArray): Result<DoubleArray> {
         var alpha = getAlpha0(data)
-        for (i in 1..4){
+        for (i in 1..4) {
             alpha = getAlphaK(data, alpha)
         }
         val beta = (data.sumOf { it.pow(alpha) } / data.size ).pow(1.0 / alpha)

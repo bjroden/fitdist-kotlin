@@ -11,8 +11,8 @@ class UniformParametersTest {
     @Test
     fun estimate(){
         val params = UniformParameters().estimate(Data.groundBeef).getOrThrow()
-        assert(KSLMath.equal(params[0], groundBeefMin)) {"Min should be $groundBeefMin, was ${params[0]}"}
-        assert(KSLMath.equal(params[1], groundBeefMax)) {"Max should be $groundBeefMax, was ${params[1]}"}
+        assert(KSLMath.equal(params[0], groundBeefMin)) { "Min should be $groundBeefMin, was ${params[0]}" }
+        assert(KSLMath.equal(params[1], groundBeefMax)) { "Max should be $groundBeefMax, was ${params[1]}" }
     }
 
 
