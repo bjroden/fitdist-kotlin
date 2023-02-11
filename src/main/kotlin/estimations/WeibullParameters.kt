@@ -6,6 +6,7 @@ import kotlin.math.pow
 class WeibullParameters : ParameterEstimatorIfc {
     //TODO: replace sumOf with more computationally stable method (and maybe pow if needed)
     override fun estimate(data: DoubleArray): Result<DoubleArray> {
+        if (data.any { it <= 0 }) { return estimateFailure("Data must be positive") }
         var alpha = getAlpha0(data)
         for (i in 1..4) {
             alpha = getAlphaK(data, alpha)
