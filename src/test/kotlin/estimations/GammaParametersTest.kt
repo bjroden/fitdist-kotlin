@@ -11,9 +11,15 @@ class GammaParametersTest {
     val groundBeefScale = 1 / groundBeefRate
 
     @Test
-    fun estimate() {
+    fun estimateGroundBeef() {
         val params = GammaParameters().estimate(Data.groundBeef).getOrThrow()
         assert(KSLMath.equal(params[0], groundBeefShape)) { "Shape should be $groundBeefShape, was ${params[0]}" }
         assert(KSLMath.equal(params[1], groundBeefScale)) { "Scale should be $groundBeefScale, was ${params[1]}" }
+    }
+
+    @Test
+    fun estimateToxocara() {
+        val result = GammaParameters().estimate(Data.toxocara)
+        assert(result.isFailure) { "Estimation should have failed due to non-positive data, was a success" }
     }
 }
