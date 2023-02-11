@@ -10,9 +10,15 @@ class WeibullParametersTest {
     val groundBeefScale = 83.34767905
 
     @Test
-    fun estimate() {
+    fun estimateGroundBeef() {
         val params = WeibullParameters().estimate(Data.groundBeef).getOrThrow()
         assert(KSLMath.equal(params[0], groundBeefShape)) { "Shape should be $groundBeefShape, was ${params[0]}" }
         assert(KSLMath.equal(params[1], groundBeefScale)) { "Scale should be $groundBeefScale, was ${params[1]}" }
+    }
+
+    @Test
+    fun estimateToxocara() {
+        val result = WeibullParameters().estimate(Data.toxocara)
+        assert(result.isFailure) { "Estimation should have failed due to non-positive data, was a success" }
     }
 }

@@ -11,10 +11,21 @@ class NormalParametersTest {
     val groundBeefStdDev = 35.81415889
     val groundBeefVariance = groundBeefStdDev.pow(2)
 
+    val toxocaraMean = 8.679245283
+    val toxocaraStdDev = 14.157834800
+    val toxocaraVariance = toxocaraStdDev.pow(2)
+
     @Test
-    fun estimate() {
+    fun estimateGroundBeef() {
         val params = NormalParameters().estimate(Data.groundBeef).getOrThrow()
         assert(KSLMath.equal(params[0], groundBeefMean)) { "Mean should be $groundBeefMean, was ${params[0]}" }
         assert(KSLMath.equal(params[1], groundBeefVariance)) { "Variance should be $groundBeefVariance, was ${params[1]}" }
+    }
+
+    @Test
+    fun estimateToxocara() {
+        val params = NormalParameters().estimate(Data.toxocara).getOrThrow()
+        assert(KSLMath.equal(params[0], toxocaraMean)) { "Mean should be $toxocaraMean, was ${params[0]}" }
+        assert(KSLMath.equal(params[1], toxocaraVariance)) { "Variance should be $toxocaraVariance, was ${params[1]}" }
     }
 }
