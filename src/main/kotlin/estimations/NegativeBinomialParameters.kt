@@ -29,7 +29,8 @@ class NegativeBinomialParameters(var maxEvaluations: Int = 1000) : ParameterEsti
             SearchInterval(0.0, Int.MAX_VALUE.toDouble()),
             MaxEval(maxEvaluations)
         ).point
-        return estimateSuccess(s, s / (mean + s))
+        val p = s / (mean + s)
+        return estimateSuccess(p, s)
     }
 
     private class FuncToOptimize(data: IntArray) : UnivariateFunction {

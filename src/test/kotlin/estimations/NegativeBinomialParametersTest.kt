@@ -5,8 +5,9 @@ import kotlin.test.Test
 
 class NegativeBinomialParametersTest {
     // Using digits = 10 in R
-    // TODO: R seems to use a real number definition instead of an integer definition. See if these should be changed
+    // R uses a mean-based parameter instead of probability of success, so our expected parameters differ
     val toxocaraSize = 0.3971457488
+    val toxocaraProb = toxocaraSize / (Data.toxocara.average() + toxocaraSize)
     val toxocaraMu = 8.6802520252
 
     @Test
@@ -18,7 +19,7 @@ class NegativeBinomialParametersTest {
     @Test
     fun estimateToxocara() {
         val params = NegativeBinomialParameters().estimate(Data.toxocara).getOrThrow()
-        assert(KSLMath.equal(params[0], toxocaraSize)) { "Size should be $toxocaraSize, was ${params[0]}" }
-        assert(KSLMath.equal(params[1], toxocaraMu)) { "Mu should be $toxocaraMu, was ${params[1]}" }
+        assert(KSLMath.equal(params[0], toxocaraProb)) { "Probability should be $toxocaraProb, was ${params[0]}" }
+        assert(KSLMath.equal(params[1], toxocaraSize)) { "Size should be $toxocaraSize, was ${params[1]}" }
     }
 }
