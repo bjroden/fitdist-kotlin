@@ -18,11 +18,11 @@ class GammaParameters : ParameterEstimatorIfc {
         val beta = Statistic(data).average / alpha
         return estimateSuccess(alpha, beta)
     }
-}
 
-private class FuncToSolve(data: DoubleArray) : FunctionIfc {
-    val rhs = sumLog(data) / data.size
-    val mean = Statistic(data).average
+    private class FuncToSolve(data: DoubleArray) : FunctionIfc {
+        val rhs = sumLog(data) / data.size
+        val mean = Statistic(data).average
 
-    override fun f(x: Double): Double = ln(mean / x) + Digamma.value(x) - rhs
+        override fun f(x: Double): Double = ln(mean / x) + Digamma.value(x) - rhs
+    }
 }
