@@ -18,8 +18,15 @@ class NegativeBinomialParametersTest {
 
     @Test
     fun estimateToxocara() {
-        val params = NegativeBinomialParameters().estimate(Data.toxocara).getOrThrow()
+        val estimator = NegativeBinomialParameters()
+        val data = Data.toxocara
+        val params = estimator.estimate(data).getOrThrow()
         assert(KSLMath.equal(params[0], toxocaraProb)) { "Probability should be $toxocaraProb, was ${params[0]}" }
         assert(KSLMath.equal(params[1], toxocaraSize)) { "Size should be $toxocaraSize, was ${params[1]}" }
+
+        val estN = estimator.estimateNumSuccesses(data, params[0]).getOrThrow()
+        val estP = estimator.estimateProbSuccess(data, params[1]).getOrThrow()
+        assert(KSLMath.equal(estP, toxocaraProb)) { "Probability should be $toxocaraProb, was $estP"}
+        assert(KSLMath.equal(estN, toxocaraSize)) { "Size should be $toxocaraSize, was $estN"}
     }
 }

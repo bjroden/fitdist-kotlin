@@ -13,10 +13,16 @@ import kotlin.math.floor
 import kotlin.math.ln
 
 public class NegativeBinomialParameters(public var maxEvaluations: Int = 1000) : ParameterEstimatorIfc {
-    override fun estimate(data: DoubleArray): Result<DoubleArray> {
-        if (data.any { it < 0 }) { return estimateFailure("Data must be non-negative") }
-        if (data.any { floor(it) != it }) { return estimateFailure("Data must be integers") }
+    public fun estimateProbSuccess(data: DoubleArray, numSuccesses: Double): Result<Double> {
+        return checkValidity(data).map { probFromNum(numSuccesses, Statistic(data).average) }
+    }
 
+    public fun estimateNumSuccesses(data: DoubleArray, probSuccess: Double): Result<Double> {
+        return checkValidity(data).map { numFromProb(probSuccess, Statistic(data).average) }
+    }
+
+    override fun estimate(data: DoubleArray): Result<DoubleArray> {
+        checkValidity(data).onFailure { return Result.failure(it) }
         val intData = data.map { it.toInt() }.toIntArray()
         val mean = Statistic(data).average
         val optimizer = BrentOptimizer(
@@ -29,7 +35,7 @@ public class NegativeBinomialParameters(public var maxEvaluations: Int = 1000) :
             SearchInterval(0.0, Int.MAX_VALUE.toDouble()),
             MaxEval(maxEvaluations)
         ).point
-        val p = s / (mean + s)
+        val p = probFromNum(s, mean)
         return estimateSuccess(p, s)
     }
 
@@ -41,7 +47,7 @@ public class NegativeBinomialParameters(public var maxEvaluations: Int = 1000) :
 
         override fun value(x: Double): Double {
             val s = x
-            val p = s / (mean + s)
+            val p = probFromNum(s, mean)
             val p1 = (1..M).sumOf { k -> fkBuckets[k - 1] * ln(s + k - 1) }
             val p2 = n * s * ln(p)
             val p3 = n * mean * ln(1 - p)
@@ -54,6 +60,24 @@ public class NegativeBinomialParameters(public var maxEvaluations: Int = 1000) :
             for (i in 1..M) { buckets[i] = buckets[i] + buckets[i-1] }
             for (i in 0..M) { buckets[i] = n - buckets[i] }
             return buckets
+        }
+    }
+
+    private companion object {
+        private fun numFromProb(p: Double, mean: Double) = -(p * mean) / (p-1)
+
+        private fun probFromNum(s: Double, mean: Double) = s / (mean + s)
+
+        private fun checkValidity(data: DoubleArray): Result<Unit> {
+            return if (data.isEmpty()) {
+                estimateFailure("Data array cannot be empty")
+            } else if (data.any { it < 0 }) {
+                estimateFailure("Data must be non-negative")
+            } else if (data.any { floor(it) != it }) {
+                estimateFailure("Data must be integers")
+            } else {
+                Result.success(Unit)
+            }
         }
     }
 }
