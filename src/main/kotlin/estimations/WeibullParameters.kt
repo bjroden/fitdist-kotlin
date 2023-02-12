@@ -3,7 +3,7 @@ package estimations
 import kotlin.math.ln
 import kotlin.math.pow
 
-class WeibullParameters : ParameterEstimatorIfc {
+public class WeibullParameters : ParameterEstimatorIfc {
     //TODO: replace sumOf with more computationally stable method (and maybe pow if needed)
     override fun estimate(data: DoubleArray): Result<DoubleArray> {
         if (data.any { it <= 0 }) { return estimateFailure("Data must be positive") }

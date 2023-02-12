@@ -3,7 +3,7 @@ package estimations
 import org.apache.commons.math3.stat.StatUtils
 import ksl.utilities.statistic.Statistic
 
-class TriangularParameters : ParameterEstimatorIfc {
+public class TriangularParameters : ParameterEstimatorIfc {
     override fun estimate(data: DoubleArray): Result<DoubleArray> {
         if (data.isEmpty()) {
             return estimateFailure("Provided data array is empty")

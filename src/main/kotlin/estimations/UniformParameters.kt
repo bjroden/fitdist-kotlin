@@ -1,6 +1,6 @@
 package estimations
 
-class UniformParameters : ParameterEstimatorIfc {
+public class UniformParameters : ParameterEstimatorIfc {
     override fun estimate(data: DoubleArray): Result<DoubleArray> {
         val alpha = data.minOrNull()
         val beta = data.maxOrNull()

@@ -12,7 +12,7 @@ import org.apache.commons.math3.optim.univariate.UnivariateObjectiveFunction
 import kotlin.math.floor
 import kotlin.math.ln
 
-class NegativeBinomialParameters(var maxEvaluations: Int = 1000) : ParameterEstimatorIfc {
+public class NegativeBinomialParameters(public var maxEvaluations: Int = 1000) : ParameterEstimatorIfc {
     override fun estimate(data: DoubleArray): Result<DoubleArray> {
         if (data.any { it < 0 }) { return estimateFailure("Data must be non-negative") }
         if (data.any { floor(it) != it }) { return estimateFailure("Data must be integers") }

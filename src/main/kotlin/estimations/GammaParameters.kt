@@ -9,7 +9,7 @@ import ksl.utilities.statistic.Statistic
 import org.apache.commons.numbers.gamma.Digamma
 import kotlin.math.ln
 
-class GammaParameters : ParameterEstimatorIfc {
+public class GammaParameters : ParameterEstimatorIfc {
     override fun estimate(data: DoubleArray): Result<DoubleArray> {
         if (data.any { it <= 0 }) { return estimateFailure("Data must be positive") }
         val solver = BisectionRootFinder(
