@@ -14,10 +14,12 @@ import kotlin.math.ln
 
 public class NegativeBinomialParameters(public var maxEvaluations: Int = 1000) : ParameterEstimatorIfc {
     public fun estimateProbSuccess(data: DoubleArray, numSuccesses: Double): Result<Double> {
+        if (numSuccesses <= 0) { return estimateFailure("NumSuccesses must be > 0") }
         return checkValidity(data).map { probFromNum(numSuccesses, Statistic(data).average) }
     }
 
     public fun estimateNumSuccesses(data: DoubleArray, probSuccess: Double): Result<Double> {
+        if (probSuccess <= 0 || probSuccess >= 1) { return estimateFailure("ProbSuccess must be in (0,1)") }
         return checkValidity(data).map { numFromProb(probSuccess, Statistic(data).average) }
     }
 
