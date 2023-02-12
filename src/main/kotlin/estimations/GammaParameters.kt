@@ -12,7 +12,10 @@ import kotlin.math.ln
 class GammaParameters : ParameterEstimatorIfc {
     override fun estimate(data: DoubleArray): Result<DoubleArray> {
         if (data.any { it <= 0 }) { return estimateFailure("Data must be positive") }
-        val solver = BisectionRootFinder(FuncToSolve(data), Interval(0.0000001, 100000.0), desiredPrec = KSLMath.machinePrecision)
+        val solver = BisectionRootFinder(
+            FuncToSolve(data),
+            Interval(KSLMath.machinePrecision, Int.MAX_VALUE.toDouble())
+        )
         solver.evaluate()
         val alpha = solver.result
         val beta = Statistic(data).average / alpha
