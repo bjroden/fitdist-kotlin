@@ -1,6 +1,7 @@
 package estimations
 
 import ksl.utilities.math.KSLMath
+import ksl.utilities.random.rvariable.ExponentialRV
 import kotlin.test.Test
 
 class ExponentialParametersTest {
@@ -21,5 +22,18 @@ class ExponentialParametersTest {
     fun estimateToxocara() {
         val params = ExponentialParameters().estimate(Data.toxocara).getOrThrow()
         assert(KSLMath.equal(params[0], toxocaraMean)) { "Mean should be $toxocaraMean, was ${params[0]}" }
+    }
+
+    @Test
+    fun estimateKSL() {
+        val kslPrecision = 0.01
+        val estimator = ExponentialParameters()
+        for (mInt in 1..5) {
+            val m = mInt.toDouble()
+            val data = ExponentialRV(m).sample(10000)
+            val params = estimator.estimate(data).getOrThrow()
+            assert(KSLMath.equal(params[0], m, precision = kslPrecision))
+                { "Mean should be $m, was ${params[0]}" }
+        }
     }
 }

@@ -1,6 +1,7 @@
 package estimations
 
 import ksl.utilities.math.KSLMath
+import ksl.utilities.random.rvariable.NegativeBinomialRV
 import kotlin.test.Test
 
 class NegativeBinomialParametersTest {
@@ -34,5 +35,23 @@ class NegativeBinomialParametersTest {
             { "Probability should be $toxocaraProb, was $estP"}
         assert(KSLMath.equal(estN, toxocaraSize, precision = tolerance))
             { "Size should be $toxocaraSize, was $estN"}
+    }
+
+    @Test
+    fun estimateKSL() {
+        val kslPrecision = 0.03
+        val estimator = NegativeBinomialParameters()
+        for (pInt in 1..5) {
+            for (nInt in 1..5) {
+                val p = pInt / 10.0
+                val n = nInt.toDouble()
+                val data = NegativeBinomialRV(p, n).sample(50000)
+                val params = estimator.estimate(data).getOrThrow()
+                assert(KSLMath.equal(params[0], p, precision = kslPrecision))
+                    { "ProbSuccess should be $p, was ${params[0]}" }
+                assert(KSLMath.equal(params[1], n, precision = kslPrecision))
+                    { "NumTrials should be $n, was ${params[1]}" }
+            }
+        }
     }
 }

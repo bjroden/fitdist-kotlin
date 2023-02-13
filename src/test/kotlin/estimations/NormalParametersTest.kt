@@ -2,6 +2,7 @@ package estimations
 
 import Data
 import ksl.utilities.math.KSLMath
+import ksl.utilities.random.rvariable.NormalRV
 import kotlin.math.pow
 import kotlin.test.Test
 
@@ -27,5 +28,23 @@ class NormalParametersTest {
         val params = NormalParameters().estimate(Data.toxocara).getOrThrow()
         assert(KSLMath.equal(params[0], toxocaraMean)) { "Mean should be $toxocaraMean, was ${params[0]}" }
         assert(KSLMath.equal(params[1], toxocaraVariance)) { "Variance should be $toxocaraVariance, was ${params[1]}" }
+    }
+
+    @Test
+    fun estimateKSL() {
+        val kslPrecision = 0.03
+        val estimator = NormalParameters()
+        for (mInt in 1..5) {
+            for (vInt in 1..5) {
+                val m = mInt.toDouble()
+                val v = vInt.toDouble()
+                val data = NormalRV(m, v).sample(50000)
+                val params = estimator.estimate(data).getOrThrow()
+                assert(KSLMath.equal(params[0], m, precision = kslPrecision))
+                    { "Mean should be $m, was ${params[0]}" }
+                assert(KSLMath.equal(params[1], v, precision = kslPrecision))
+                    { "Variance should be $v, was ${params[1]}" }
+            }
+        }
     }
 }
