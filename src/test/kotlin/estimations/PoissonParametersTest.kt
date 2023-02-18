@@ -25,7 +25,7 @@ class PoissonParametersTest {
         val estimator = PoissonParameters()
         for (mInt in 1..5) {
             val m = mInt.toDouble()
-            val data = PoissonRV(m).sample(Data.defaultRVSampleSize)
+            val data = PoissonRV(m, Data.rvTestStream).sample(Data.defaultRVSampleSize)
             val params = estimator.estimate(data).getOrThrow()
             assert(KSLMath.equal(params[0], m, precision = Data.defaultRVTestTolerance))
                 { "Mean should be $m, was ${params[0]}" }

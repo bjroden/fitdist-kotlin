@@ -34,7 +34,7 @@ class WeibullParametersTest {
             for (scaleInt in 1..5) {
                 val shape = shapeInt.toDouble()
                 val scale = scaleInt.toDouble()
-                val data = WeibullRV(shape, scale).sample(Data.defaultRVSampleSize)
+                val data = WeibullRV(shape, scale, Data.rvTestStream).sample(Data.defaultRVSampleSize)
                 val params = estimator.estimate(data).getOrThrow()
                 assert(KSLMath.equal(params[0], shape, precision = Data.defaultRVTestTolerance))
                     { "Shape should be $shape, was ${params[0]}" }

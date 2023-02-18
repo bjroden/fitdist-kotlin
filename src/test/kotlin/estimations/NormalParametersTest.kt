@@ -37,7 +37,7 @@ class NormalParametersTest {
             for (vInt in 1..5) {
                 val m = mInt.toDouble()
                 val v = vInt.toDouble()
-                val data = NormalRV(m, v).sample(Data.defaultRVSampleSize)
+                val data = NormalRV(m, v, Data.rvTestStream).sample(Data.defaultRVSampleSize)
                 val params = estimator.estimate(data).getOrThrow()
                 assert(KSLMath.equal(params[0], m, precision = Data.defaultRVTestTolerance))
                     { "Mean should be $m, was ${params[0]}" }

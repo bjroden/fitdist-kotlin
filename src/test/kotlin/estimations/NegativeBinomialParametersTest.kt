@@ -44,7 +44,7 @@ class NegativeBinomialParametersTest {
             for (nInt in 1..5) {
                 val p = pInt / 10.0
                 val n = nInt.toDouble()
-                val data = NegativeBinomialRV(p, n).sample(Data.defaultRVSampleSize)
+                val data = NegativeBinomialRV(p, n, Data.rvTestStream).sample(Data.defaultRVSampleSize)
                 val params = estimator.estimate(data).getOrThrow()
                 assert(KSLMath.equal(params[0], p, precision = Data.defaultRVTestTolerance))
                     { "ProbSuccess should be $p, was ${params[0]}" }
