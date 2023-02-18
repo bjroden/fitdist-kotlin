@@ -25,14 +25,13 @@ class ExponentialParametersTest {
     }
 
     @Test
-    fun estimateKSL() {
-        val kslPrecision = 0.01
+    fun estimateRV() {
         val estimator = ExponentialParameters()
         for (mInt in 1..5) {
             val m = mInt.toDouble()
-            val data = ExponentialRV(m).sample(20000)
+            val data = ExponentialRV(m).sample(Data.defaultRVSampleSize)
             val params = estimator.estimate(data).getOrThrow()
-            assert(KSLMath.equal(params[0], m, precision = kslPrecision))
+            assert(KSLMath.equal(params[0], m, precision = Data.defaultRVTestTolerance))
                 { "Mean should be $m, was ${params[0]}" }
         }
     }

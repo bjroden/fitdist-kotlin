@@ -29,18 +29,17 @@ class GammaParametersTest {
     }
 
     @Test
-    fun estimateKSL() {
-        val kslPrecision = 0.04
+    fun estimateRV() {
         val estimator = GammaParameters()
         for (shapeInt in 1..5) {
             for (scaleInt in 1..5) {
                 val shape = shapeInt.toDouble()
                 val scale = scaleInt.toDouble()
-                val data = GammaRV(shape, scale).sample(20000)
+                val data = GammaRV(shape, scale).sample(Data.defaultRVSampleSize)
                 val params = estimator.estimate(data).getOrThrow()
-                assert(KSLMath.equal(params[0], shape, precision = kslPrecision))
+                assert(KSLMath.equal(params[0], shape, precision = Data.defaultRVTestTolerance))
                     { "Shape should be $shape, was ${params[0]}" }
-                assert(KSLMath.equal(params[1], scale, precision = kslPrecision))
+                assert(KSLMath.equal(params[1], scale, precision = Data.defaultRVTestTolerance))
                     { "Scale should be $scale, was ${params[1]}" }
             }
         }

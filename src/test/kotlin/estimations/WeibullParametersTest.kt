@@ -28,18 +28,17 @@ class WeibullParametersTest {
     }
 
     @Test
-    fun estimateKSL() {
-        val kslPrecision = 0.03
+    fun estimateRV() {
         val estimator = WeibullParameters()
         for (shapeInt in 1..5) {
             for (scaleInt in 1..5) {
                 val shape = shapeInt.toDouble()
                 val scale = scaleInt.toDouble()
-                val data = WeibullRV(shape, scale).sample(50000)
+                val data = WeibullRV(shape, scale).sample(Data.defaultRVSampleSize)
                 val params = estimator.estimate(data).getOrThrow()
-                assert(KSLMath.equal(params[0], shape, precision = kslPrecision))
+                assert(KSLMath.equal(params[0], shape, precision = Data.defaultRVTestTolerance))
                     { "Shape should be $shape, was ${params[0]}" }
-                assert(KSLMath.equal(params[1], scale, precision = kslPrecision))
+                assert(KSLMath.equal(params[1], scale, precision = Data.defaultRVTestTolerance))
                     { "Scale should be $scale, was ${params[1]}" }
             }
         }

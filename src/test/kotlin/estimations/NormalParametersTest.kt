@@ -31,18 +31,17 @@ class NormalParametersTest {
     }
 
     @Test
-    fun estimateKSL() {
-        val kslPrecision = 0.03
+    fun estimateRV() {
         val estimator = NormalParameters()
         for (mInt in 1..5) {
             for (vInt in 1..5) {
                 val m = mInt.toDouble()
                 val v = vInt.toDouble()
-                val data = NormalRV(m, v).sample(50000)
+                val data = NormalRV(m, v).sample(Data.defaultRVSampleSize)
                 val params = estimator.estimate(data).getOrThrow()
-                assert(KSLMath.equal(params[0], m, precision = kslPrecision))
+                assert(KSLMath.equal(params[0], m, precision = Data.defaultRVTestTolerance))
                     { "Mean should be $m, was ${params[0]}" }
-                assert(KSLMath.equal(params[1], v, precision = kslPrecision))
+                assert(KSLMath.equal(params[1], v, precision = Data.defaultRVTestTolerance))
                     { "Variance should be $v, was ${params[1]}" }
             }
         }

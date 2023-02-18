@@ -38,18 +38,17 @@ class NegativeBinomialParametersTest {
     }
 
     @Test
-    fun estimateKSL() {
-        val kslPrecision = 0.03
+    fun estimateRV() {
         val estimator = NegativeBinomialParameters()
         for (pInt in 1..5) {
             for (nInt in 1..5) {
                 val p = pInt / 10.0
                 val n = nInt.toDouble()
-                val data = NegativeBinomialRV(p, n).sample(50000)
+                val data = NegativeBinomialRV(p, n).sample(Data.defaultRVSampleSize)
                 val params = estimator.estimate(data).getOrThrow()
-                assert(KSLMath.equal(params[0], p, precision = kslPrecision))
+                assert(KSLMath.equal(params[0], p, precision = Data.defaultRVTestTolerance))
                     { "ProbSuccess should be $p, was ${params[0]}" }
-                assert(KSLMath.equal(params[1], n, precision = kslPrecision))
+                assert(KSLMath.equal(params[1], n, precision = Data.defaultRVTestTolerance))
                     { "NumTrials should be $n, was ${params[1]}" }
             }
         }

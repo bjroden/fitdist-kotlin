@@ -1,4 +1,9 @@
 object Data {
+    // Default values for KSL RV tests
+    // Must balance between test performance and desired precision, higher sample size = stricter tolerance
+    const val defaultRVSampleSize = 50000
+    const val defaultRVTestTolerance = 0.025
+
     // groundbeef$serving data set from fitdistrplus R library
     // https://cran.r-project.org/web/packages/fitdistrplus/index.html
     val groundBeef = doubleArrayOf(
