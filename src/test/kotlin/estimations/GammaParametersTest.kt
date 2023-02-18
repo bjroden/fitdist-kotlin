@@ -36,12 +36,12 @@ class GammaParametersTest {
             for (scaleInt in 1..5) {
                 val shape = shapeInt.toDouble()
                 val scale = scaleInt.toDouble()
-                val data = GammaRV(shape, scale).sample(10000)
+                val data = GammaRV(shape, scale).sample(20000)
                 val params = estimator.estimate(data).getOrThrow()
                 assert(KSLMath.equal(params[0], shape, precision = kslPrecision))
                     { "Shape should be $shape, was ${params[0]}" }
                 assert(KSLMath.equal(params[1], scale, precision = kslPrecision))
-                    { "Scale should be $scale, was ${params[0]}" }
+                    { "Scale should be $scale, was ${params[1]}" }
             }
         }
     }

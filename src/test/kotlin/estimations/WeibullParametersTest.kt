@@ -2,6 +2,7 @@ package estimations
 
 import Data
 import ksl.utilities.math.KSLMath
+import ksl.utilities.random.rvariable.WeibullRV
 import kotlin.test.Test
 
 class WeibullParametersTest {
@@ -25,4 +26,23 @@ class WeibullParametersTest {
         val result = WeibullParameters().estimate(Data.toxocara)
         assert(result.isFailure) { "Estimation should have failed due to non-positive data, was a success" }
     }
+
+    @Test
+    fun estimateKSL() {
+        val kslPrecision = 0.03
+        val estimator = WeibullParameters()
+        for (shapeInt in 1..5) {
+            for (scaleInt in 1..5) {
+                val shape = shapeInt.toDouble()
+                val scale = scaleInt.toDouble()
+                val data = WeibullRV(shape, scale).sample(50000)
+                val params = estimator.estimate(data).getOrThrow()
+                assert(KSLMath.equal(params[0], shape, precision = kslPrecision))
+                    { "Shape should be $shape, was ${params[0]}" }
+                assert(KSLMath.equal(params[1], scale, precision = kslPrecision))
+                    { "Scale should be $scale, was ${params[1]}" }
+            }
+        }
+    }
+
 }

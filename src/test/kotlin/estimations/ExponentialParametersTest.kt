@@ -30,7 +30,7 @@ class ExponentialParametersTest {
         val estimator = ExponentialParameters()
         for (mInt in 1..5) {
             val m = mInt.toDouble()
-            val data = ExponentialRV(m).sample(10000)
+            val data = ExponentialRV(m).sample(20000)
             val params = estimator.estimate(data).getOrThrow()
             assert(KSLMath.equal(params[0], m, precision = kslPrecision))
                 { "Mean should be $m, was ${params[0]}" }
