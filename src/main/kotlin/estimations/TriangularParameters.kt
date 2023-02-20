@@ -1,6 +1,5 @@
 package estimations
 
-import org.apache.commons.math3.stat.StatUtils
 import ksl.utilities.statistic.Statistic
 
 public class TriangularParameters : ParameterEstimatorIfc {
@@ -10,9 +9,9 @@ public class TriangularParameters : ParameterEstimatorIfc {
         }
 
         val min = data.min()
-        val modes = StatUtils.mode(data)
-        val mode = Statistic(modes).average
+        val mean = Statistic(data).average
         val max = data.max()
+        val mode = (3 * mean) - min - max
 
         return estimateSuccess(min, mode, max)
 
