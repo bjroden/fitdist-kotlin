@@ -5,8 +5,9 @@ import kotlin.math.floor
 
 public class DataManipulation {
     public fun shiftData(data: DoubleArray, zeroPoint: Double = 0.0) : ShiftDataResult {
+        val dataCopy = data.copyOf()
         val offset = (floor(data.min()) - floor(zeroPoint))
-        val shiftedData = data.subtractConstant(offset)
+        val shiftedData = dataCopy.subtractConstant(offset)
         return ShiftDataResult(shiftedData, offset)
     }
 }
