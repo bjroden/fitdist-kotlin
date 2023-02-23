@@ -39,9 +39,8 @@ public class GofFactory {
         }
 
         private fun makeKs(data: DoubleArray, dist: ContinuousDistributionIfc): KolmogorovSmirnovGofTest {
-            val expected = (1..data.size).map { it.toDouble() / data.size }.toDoubleArray()
-            val observed = data.sortedArray().map { dist.cdf(it) }.toDoubleArray()
-            return KolmogorovSmirnovGofTest(expected, observed)
+            val cdfs = data.sortedArray().map { dist.cdf(it) }.toDoubleArray()
+            return KolmogorovSmirnovGofTest(cdfs)
         }
     }
 }
