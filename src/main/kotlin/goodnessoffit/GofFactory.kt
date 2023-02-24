@@ -3,14 +3,18 @@ package goodnessoffit
 import ksl.utilities.distributions.CDFIfc
 import ksl.utilities.distributions.ContinuousDistributionIfc
 import ksl.utilities.distributions.DiscreteDistributionIfc
+import ksl.utilities.distributions.DistributionIfc
 import ksl.utilities.statistic.Histogram
 
 public class GofFactory {
-    public fun <T: AbstractGofTest> continuousTest(
+    public fun <T, D> continuousTest(
         request: ContinuousRequest<T>,
         data: DoubleArray,
-        dist: ContinuousDistributionIfc
-    ): T {
+        dist: D
+    ): T
+    where T: AbstractGofTest,
+          D: DistributionIfc<D>,
+          D: ContinuousDistributionIfc {
         @Suppress("UNCHECKED_CAST")
         return when (request) {
             is ChiSquareRequest -> makeChiSquare(data, dist, request)
@@ -18,11 +22,14 @@ public class GofFactory {
         } as T
     }
 
-    public fun <T: AbstractGofTest> discreteTest(
+    public fun <T, D> discreteTest(
         request: DiscreteRequest<T>,
         data: DoubleArray,
-        dist: DiscreteDistributionIfc
-    ): T {
+        dist: D
+    ): T
+    where T: AbstractGofTest,
+          D: DistributionIfc<D>,
+          D: DiscreteDistributionIfc {
         @Suppress("UNCHECKED_CAST")
         return when (request) {
             is ChiSquareRequest -> makeChiSquare(data, dist, request)
@@ -31,15 +38,15 @@ public class GofFactory {
 
 
     private companion object {
-        private fun makeChiSquare(
+        private fun <T> makeChiSquare(
             data: DoubleArray,
-            dist: CDFIfc,
+            dist: DistributionIfc<T>,
             request: ChiSquareRequest
         ): ChiSquareGofTest {
             val bins = request.breakPoints ?: automaticBins(data)
             val observedCounts = countObserved(data, bins)
             val expectedCounts = countExpected(data, dist, bins)
-            return ChiSquareGofTest(expectedCounts, observedCounts)
+            return ChiSquareGofTest(expectedCounts, observedCounts, dist.parameters().size)
         }
 
         private fun countObserved(data: DoubleArray, bins: DoubleArray): DoubleArray {

@@ -8,7 +8,7 @@ import org.apache.commons.math3.stat.inference.ChiSquareTest
 public class ChiSquareGofTest(
     expected: DoubleArray,
     observed: DoubleArray,
-    parameterCount: Int = 1
+    parameterCount: Int
 ) : AbstractGofTest(), PValueIfc {
 
     override val testScore: Double
