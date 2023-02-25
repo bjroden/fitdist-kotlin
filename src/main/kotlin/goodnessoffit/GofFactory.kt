@@ -43,6 +43,12 @@ public class GofFactory {
             dist: DistributionIfc<T>,
             request: ChiSquareRequest
         ): ChiSquareGofTest {
+            // TODO: See where the ends of empirical distributions should be when making the
+            //  intervals. Currently, values outside the histogram bins are not taken into account,
+            //  which leaves out values that might be expected past that point. In our reference
+            //  material, this was taken into account and then the last few intervals were summed
+            //  together, but since we're not combining intervals, introducing these outer values
+            //  might give different results than expected.
             val bins = request.breakPoints ?: automaticBins(data)
             val observedCounts = countObserved(data, bins)
             val expectedCounts = countExpected(data, dist, bins)
