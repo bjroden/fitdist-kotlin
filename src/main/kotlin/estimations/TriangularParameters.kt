@@ -11,7 +11,14 @@ public class TriangularParameters : ParameterEstimatorIfc {
         val min = data.min()
         val mean = Statistic(data).average
         val max = data.max()
-        val mode = (3 * mean) - min - max
+        var mode = (3 * mean) - min - max
+
+        if(mode > max){
+            mode = max
+        }
+        if(mode < min){
+            mode = min
+        }
 
         return estimateSuccess(min, mode, max)
 
