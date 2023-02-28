@@ -6,14 +6,14 @@ plugins {
 }
 
 group = "org.example"
-version = "1.0-SNAPSHOT"
+version = "0.1.1"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation("io.github.rossetti:KSLCore:R1.0.1")
+    api("io.github.rossetti:KSLCore:R1.0.1")
     implementation("org.apache.commons:commons-math3:3.6.1")
     implementation("org.apache.commons:commons-numbers-gamma:1.1")
     testImplementation(kotlin("test"))
