@@ -12,5 +12,8 @@ class DataManipulationTest {
         val shiftedData = DataManipulation.shiftData(Data.groundBeef)
         assert(KSLMath.equal(groundBeefOffset, shiftedData.offset))
             { "Offset should have been ${groundBeefOffset}, was ${shiftedData.offset}" }
+        val unShiftedData = DataManipulation.shiftData(shiftedData.data, zeroPoint = shiftedData.offset)
+        assert(KSLMath.equal(-groundBeefOffset, unShiftedData.offset))
+            { "Offset should have been ${-groundBeefOffset}, was ${unShiftedData.offset}" }
     }
 }
