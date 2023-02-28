@@ -20,7 +20,7 @@ public class ChiSquareGofTest(
     init {
         require(expected.size == observed.size) { "Expected and observed arrays must be same size" }
         require(expected.size >= 2) { "Expected and observed array length must be >= 2" }
-        require(allNonnegative(expected) && allNonnegative(observed)) { "Expected and observed array length must be >= 2" }
+        require(allNonnegative(expected) && allNonnegative(observed)) { "Data cannot be negative" }
 
         intervals = expected.size
         degreesOfFreedom = intervals - 1 - parameterCount
