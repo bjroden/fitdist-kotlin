@@ -43,33 +43,28 @@ public class GofFactory {
             dist: DistributionIfc<T>,
             request: ChiSquareRequest
         ): ChiSquareGofTest {
-            // TODO: See where the ends of empirical distributions should be when making the
-            //  intervals. Currently, values outside the histogram bins are not taken into account,
-            //  which leaves out values that might be expected past that point. In our reference
-            //  material, this was taken into account and then the last few intervals were summed
-            //  together, but since we're not combining intervals, introducing these outer values
-            //  might give different results than expected.
             val bins = request.breakPoints ?: automaticBins(data)
             val observedCounts = countObserved(data, bins)
-            val expectedCounts = countExpected(data, dist, bins)
-            return ChiSquareGofTest(expectedCounts, observedCounts, dist.parameters().size)
+            val expectedCounts = countExpected(data.size, dist, bins)
+            val positiveExpectedCounts = expectedCounts.indices.filter { expectedCounts[it] > 0 }
+            val expectedPositive = expectedCounts.sliceArray(positiveExpectedCounts)
+            val observedPositive = observedCounts.sliceArray(positiveExpectedCounts)
+            return ChiSquareGofTest(expectedPositive, observedPositive, dist.parameters().size)
         }
 
         private fun countObserved(data: DoubleArray, bins: DoubleArray): DoubleArray {
-            // Use same method of histogram collection as R:
-            // lower < value <= higher, with min value going to first bucket
-            val counts = bins.toList().zipWithNext { lower, upper ->
-                    data.count { lower < it && it <= upper  }.toDouble()
-                }.toMutableList()
-            counts[0] = counts[0] + data.count { it == bins.min() }
-            return counts.toDoubleArray()
+            val histogram = Histogram(bins)
+            histogram.collect(data)
+            return doubleArrayOf(histogram.underFlowCount, *histogram.binCounts, histogram.overFlowCount)
         }
 
-        private fun countExpected(data: DoubleArray, dist: CDFIfc, bins: DoubleArray): DoubleArray {
-            val n = data.size
-            return bins.toList().zipWithNext { lower, upper ->
+        private fun countExpected(n: Int, dist: CDFIfc, bins: DoubleArray): DoubleArray {
+            val underflow = n * dist.cdf(bins.min())
+            val overflow = n * (1 - dist.cdf(bins.max()))
+            val middle = bins.toList().zipWithNext { lower, upper ->
                 n * ( dist.cdf(upper) - dist.cdf(lower) )
             }.toDoubleArray()
+            return doubleArrayOf(underflow, *middle, overflow)
         }
 
         private fun automaticBins(data: DoubleArray) = Histogram.recommendBreakPoints(data)
