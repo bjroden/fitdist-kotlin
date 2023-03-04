@@ -1,24 +1,27 @@
 package goodnessoffit
 
 import Data
-import estimations.ExponentialParameters
 import ksl.utilities.distributions.Exponential
 import ksl.utilities.math.KSLMath
 import ksl.utilities.random.rvariable.ExponentialRV
 import kotlin.test.Test
-import kotlin.test.fail
 
 class GofFactoryTest {
     @Test
     fun manualChiSquareIntervals() {
+        val chiSquareValueR = 4.49955476
+        val estimatedMeanR = 1 / 0.2507453184
+        val pValueR = 0.7207708875
+
         val data = ExponentialRV(4.0, stream = Data.rvTestStream).sample(100)
         // Breaks used in R histogram
         val breaks = (0..16 step 2).map { it.toDouble() }.toDoubleArray()
-        val dist = Exponential(ExponentialParameters().estimate(data).getOrThrow())
+        val dist = Exponential(estimatedMeanR)
         val test = GofFactory().continuousTest(ChiSquareRequest(breaks), data, dist)
-        // TODO: fill in assert values when we confirm where the "ends" of the empirical
-        //  should be when making chi square intervals
-        fail("TODO: Need chi square interval comparison to R data")
+        assert(KSLMath.equal(test.testScore, chiSquareValueR))
+            { "Chi square value should be $chiSquareValueR, was ${test.testScore}" }
+        assert(KSLMath.equal(test.testScore, chiSquareValueR))
+            { "Chi square p-value should be $pValueR, was ${test.pValue}" }
     }
 
     @Test
