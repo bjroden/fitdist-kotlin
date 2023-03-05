@@ -1,10 +1,9 @@
 package goodnessoffit
 
-import ksl.utilities.distributions.CDFIfc
-import ksl.utilities.distributions.ContinuousDistributionIfc
-import ksl.utilities.distributions.DiscreteDistributionIfc
-import ksl.utilities.distributions.DistributionIfc
+import ksl.utilities.distributions.*
 import ksl.utilities.statistic.Histogram
+import kotlin.math.floor
+import kotlin.math.roundToInt
 
 public class GofFactory {
     public fun <T, D> continuousTest(
@@ -17,7 +16,7 @@ public class GofFactory {
           D: ContinuousDistributionIfc {
         @Suppress("UNCHECKED_CAST")
         return when (request) {
-            is ChiSquareRequest -> makeChiSquare(data, dist, request)
+            is ChiSquareRequest -> makeChiSquareContinuous(data, dist, request)
             is KSRequest -> makeKs(data, dist)
         } as T
     }
@@ -32,17 +31,19 @@ public class GofFactory {
           D: DiscreteDistributionIfc {
         @Suppress("UNCHECKED_CAST")
         return when (request) {
-            is ChiSquareRequest -> makeChiSquare(data, dist, request)
+            is ChiSquareRequest -> makeChiSquareDiscrete(data, dist)
         } as T
     }
 
 
     private companion object {
-        private fun <T> makeChiSquare(
+        private fun <T> makeChiSquareContinuous(
             data: DoubleArray,
-            dist: DistributionIfc<T>,
+            dist: T,
             request: ChiSquareRequest
-        ): ChiSquareGofTest {
+        ): ChiSquareGofTest
+        where T: DistributionIfc<T>,
+              T: ContinuousDistributionIfc {
             val bins = request.breakPoints ?: automaticBins(data)
             val observedCounts = countObserved(data, bins)
             val expectedCounts = countExpected(data.size, dist, bins)
@@ -50,6 +51,32 @@ public class GofFactory {
             val expectedPositive = expectedCounts.sliceArray(positiveExpectedCounts)
             val observedPositive = observedCounts.sliceArray(positiveExpectedCounts)
             return ChiSquareGofTest(expectedPositive, observedPositive, dist.parameters().size)
+        }
+
+        private fun <T> makeChiSquareDiscrete(
+            data: DoubleArray,
+            dist: T
+        ): ChiSquareGofTest
+        where T: DistributionIfc<T>,
+              T: DiscreteDistributionIfc {
+            require(data.all { floor(it) == it }) { "Data input cannot contain non-integer data" }
+            val intData = data.map { it.roundToInt() }.toIntArray()
+            val observedCounts = countObservedDiscrete(intData)
+            val expectedCounts = countExpectedDiscrete(data.size, intData, dist)
+            val positiveExpectedCounts = expectedCounts.indices.filter { expectedCounts[it] > 0 }
+            val expectedPositive = expectedCounts.sliceArray(positiveExpectedCounts)
+            val observedPositive = observedCounts.sliceArray(positiveExpectedCounts)
+            return ChiSquareGofTest(expectedPositive, observedPositive, dist.parameters().size)
+        }
+
+        private fun countObservedDiscrete(data: IntArray): DoubleArray {
+            val counts = IntArray(data.max() + 1)
+            data.forEach { counts[it] += 1 }
+            return counts.map { it.toDouble() }.toDoubleArray()
+        }
+
+        private fun countExpectedDiscrete(n: Int, data: IntArray, dist: PMFIfc): DoubleArray {
+            return (0..data.max()).map { n * dist.pmf(it.toDouble()) }.toDoubleArray()
         }
 
         private fun countObserved(data: DoubleArray, bins: DoubleArray): DoubleArray {
