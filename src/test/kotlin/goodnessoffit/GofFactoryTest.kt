@@ -52,15 +52,14 @@ class GofFactoryTest {
     fun kolmogorovSmirnovTest() {
         val ksValueR = 0.074913363
         val estimatedMeanR = 1 / 0.2507453184
-        val pValueR = 0.6286257
+        // P-value uses exact=TRUE in R's ks.test function, since this is what Apache Commons uses
+        val pValueR = 0.6018019
 
         val data = ExponentialRV(4.0, stream = Data.rvTestStream).sample(100)
         val dist = Exponential(estimatedMeanR)
         val test = GofFactory().continuousTest(KSRequest, data, dist)
         assert(KSLMath.equal(test.testScore, ksValueR, precision = 0.000001))
             { "KS score should be $ksValueR, was ${test.testScore}" }
-        // TODO: Currently fails, even when the cdf method used in KS class is replaced with the RealDistribution
-        //  method with hardcoded values. See if this is an acceptable deviation from R.
         assert(KSLMath.equal(test.pValue, pValueR, precision = 0.000001))
             { "KS score should be $pValueR, was ${test.pValue}" }
     }
