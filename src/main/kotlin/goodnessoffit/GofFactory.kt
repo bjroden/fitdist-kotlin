@@ -3,7 +3,6 @@ package goodnessoffit
 import ksl.utilities.distributions.*
 import ksl.utilities.statistic.Histogram
 import kotlin.math.floor
-import kotlin.math.roundToInt
 
 public class GofFactory {
     public fun <T, D> continuousTest(
@@ -31,7 +30,7 @@ public class GofFactory {
           D: DiscreteDistributionIfc {
         @Suppress("UNCHECKED_CAST")
         return when (request) {
-            is ChiSquareRequest -> makeChiSquareDiscrete(data, dist)
+            is ChiSquareRequest -> makeChiSquareDiscrete(data, dist, request)
         } as T
     }
 
@@ -44,9 +43,9 @@ public class GofFactory {
         ): ChiSquareGofTest
         where T: DistributionIfc<T>,
               T: ContinuousDistributionIfc {
-            val bins = request.breakPoints ?: automaticBins(data)
-            val observedCounts = countObserved(data, bins)
-            val expectedCounts = countExpected(data.size, dist, bins)
+            val bins = request.breakPoints ?: automaticBinsContinuous(data)
+            val observedCounts = countObservedContinuous(data, bins)
+            val expectedCounts = countExpectedContinuous(data.size, dist, bins)
             val positiveExpectedCounts = expectedCounts.indices.filter { expectedCounts[it] > 0 }
             val expectedPositive = expectedCounts.sliceArray(positiveExpectedCounts)
             val observedPositive = observedCounts.sliceArray(positiveExpectedCounts)
@@ -55,37 +54,43 @@ public class GofFactory {
 
         private fun <T> makeChiSquareDiscrete(
             data: DoubleArray,
-            dist: T
+            dist: T,
+            request: ChiSquareRequest
         ): ChiSquareGofTest
         where T: DistributionIfc<T>,
               T: DiscreteDistributionIfc {
             require(data.all { floor(it) == it }) { "Data input cannot contain non-integer data" }
-            val intData = data.map { it.roundToInt() }.toIntArray()
-            val observedCounts = countObservedDiscrete(intData)
-            val expectedCounts = countExpectedDiscrete(data.size, intData, dist)
+            val bins = request.breakPoints ?: automaticBinsDiscrete(data)
+            val observedCounts = countObservedDiscrete(data, bins)
+            val expectedCounts = countExpectedDiscrete(data.size, dist, bins)
             val positiveExpectedCounts = expectedCounts.indices.filter { expectedCounts[it] > 0 }
             val expectedPositive = expectedCounts.sliceArray(positiveExpectedCounts)
             val observedPositive = observedCounts.sliceArray(positiveExpectedCounts)
             return ChiSquareGofTest(expectedPositive, observedPositive, dist.parameters().size)
         }
 
-        private fun countObservedDiscrete(data: IntArray): DoubleArray {
-            val counts = IntArray(data.max() + 1)
-            data.forEach { counts[it] += 1 }
-            return counts.map { it.toDouble() }.toDoubleArray()
+        private fun countObservedDiscrete(data: DoubleArray, bins: DoubleArray): DoubleArray {
+            val first = data.count { it <= bins[0] }.toDouble()
+            val rest = bins.toList().zipWithNext { lower, higher ->
+                data.count { lower < it && it <= higher }.toDouble()
+            }.toDoubleArray()
+            return doubleArrayOf(first, *rest)
         }
 
-        private fun countExpectedDiscrete(n: Int, data: IntArray, dist: PMFIfc): DoubleArray {
-            return (0..data.max()).map { n * dist.pmf(it.toDouble()) }.toDoubleArray()
+        private fun countExpectedDiscrete(n: Int, dist: DiscreteDistributionIfc, bins: DoubleArray): DoubleArray {
+            val first = n * dist.cdf(bins.min())
+            val rest = bins.toList().zipWithNext { lower, higher ->
+                n * ( dist.cdf(higher) - dist.cdf(lower) )
+            }.toDoubleArray()
+            return doubleArrayOf(first, *rest)
         }
 
-        private fun countObserved(data: DoubleArray, bins: DoubleArray): DoubleArray {
-            val histogram = Histogram(bins)
-            histogram.collect(data)
+        private fun countObservedContinuous(data: DoubleArray, bins: DoubleArray): DoubleArray {
+            val histogram = Histogram(bins).apply { collect(data) }
             return doubleArrayOf(histogram.underFlowCount, *histogram.binCounts, histogram.overFlowCount)
         }
 
-        private fun countExpected(n: Int, dist: CDFIfc, bins: DoubleArray): DoubleArray {
+        private fun countExpectedContinuous(n: Int, dist: CDFIfc, bins: DoubleArray): DoubleArray {
             val underflow = n * dist.cdf(bins.min())
             val overflow = n * (1 - dist.cdf(bins.max()))
             val middle = bins.toList().zipWithNext { lower, upper ->
@@ -94,7 +99,12 @@ public class GofFactory {
             return doubleArrayOf(underflow, *middle, overflow)
         }
 
-        private fun automaticBins(data: DoubleArray) = Histogram.recommendBreakPoints(data)
+        private fun automaticBinsContinuous(data: DoubleArray) = Histogram.recommendBreakPoints(data)
+
+        private fun automaticBinsDiscrete(data: DoubleArray) =
+            (0..data.max().toInt())
+                .map { it.toDouble() }
+                .toDoubleArray()
 
         private fun makeKs(data: DoubleArray, dist: ContinuousDistributionIfc): KolmogorovSmirnovGofTest {
             val cdfs = data.sortedArray().map { dist.cdf(it) }.toDoubleArray()

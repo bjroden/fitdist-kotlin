@@ -49,6 +49,27 @@ class GofFactoryTest {
     }
 
     @Test
+    fun chiSquareDiscreteManualBreakPoints() {
+        val testMean = 4.0
+        val estimatedMeanR = 4.04
+        val sampleSize = 100
+        val chiSquareValueR = 2.923183584
+        val pValueR = 0.71182745
+        // Apache commons' Chi Square test resizes arrays if expected and observed counts are different,
+        //  which is the case here, so results will differ slightly
+        val precision = 0.05
+
+        val data = PoissonRV(testMean, stream = Data.rvTestStream).sample(sampleSize)
+        val dist = Poisson(estimatedMeanR)
+        val request = ChiSquareRequest(doubleArrayOf(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 8.0))
+        val test = GofFactory().discreteTest(request, data, dist)
+        assert(KSLMath.equal(test.testScore, chiSquareValueR, precision = precision))
+            { "Chi square value should be $chiSquareValueR, was ${test.testScore}" }
+        assert(KSLMath.equal(test.testScore, chiSquareValueR, precision = precision))
+            { "Chi square p-value should be $pValueR, was ${test.pValue}" }
+    }
+
+    @Test
     fun kolmogorovSmirnovTest() {
         val ksValueR = 0.074913363
         val estimatedMeanR = 1 / 0.2507453184
