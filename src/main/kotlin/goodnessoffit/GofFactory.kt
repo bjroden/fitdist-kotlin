@@ -11,7 +11,7 @@ public class GofFactory {
         dist: D
     ): T
     where T: AbstractGofTest,
-          D: DistributionIfc<D>,
+          D: DistributionIfc<*>,
           D: ContinuousDistributionIfc {
         @Suppress("UNCHECKED_CAST")
         return when (request) {
@@ -26,7 +26,7 @@ public class GofFactory {
         dist: D
     ): T
     where T: AbstractGofTest,
-          D: DistributionIfc<D>,
+          D: DistributionIfc<*>,
           D: DiscreteDistributionIfc {
         @Suppress("UNCHECKED_CAST")
         return when (request) {
@@ -41,7 +41,7 @@ public class GofFactory {
             dist: T,
             request: ChiSquareRequest
         ): ChiSquareGofTest
-        where T: DistributionIfc<T>,
+        where T: DistributionIfc<*>,
               T: ContinuousDistributionIfc {
             val bins = request.breakPoints ?: automaticBinsContinuous(data)
             val observedCounts = countObservedContinuous(data, bins)
@@ -57,7 +57,7 @@ public class GofFactory {
             dist: T,
             request: ChiSquareRequest
         ): ChiSquareGofTest
-        where T: DistributionIfc<T>,
+        where T: DistributionIfc<*>,
               T: DiscreteDistributionIfc {
             require(data.all { floor(it) == it }) { "Data input cannot contain non-integer data" }
             val bins = request.breakPoints ?: automaticBinsDiscrete(data)
