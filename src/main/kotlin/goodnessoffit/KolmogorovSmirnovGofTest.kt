@@ -11,7 +11,7 @@ public class KolmogorovSmirnovGofTest(
 
     override val testScore: Double
     override val pValue: Double
-    override val warnings: Set<WarningIfc>
+    override val warnings: Set<KSWarning>
 
     init {
         require(cdfs.size >= 2) { "Array length must be >= 2" }
