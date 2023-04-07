@@ -13,6 +13,7 @@ public class ChiSquareGofTest(
 
     override val testScore: Double
     override val pValue: Double
+    override val universalScore: Double
     override val warnings: Set<ChiSquareWarning>
     public val degreesOfFreedom: Int
     public val intervals: Int
@@ -27,6 +28,7 @@ public class ChiSquareGofTest(
         val longObserved = observed.map { it.toLong() }.toLongArray()
         testScore = ChiSquareTest().chiSquare(expected, longObserved)
         pValue = 1 - ChiSquaredDistribution(degreesOfFreedom.toDouble()).cumulativeProbability(testScore)
+        universalScore = pValue
         warnings = ChiSquareWarning.values().filter { warning ->
             when (warning) {
                 ChiSquareWarning.SMALL_EXPECTED_COUNTS -> expected.count { it <= 5 } >= 0.2 * expected.size
