@@ -41,7 +41,7 @@ class GofFactoryTest {
 
         val data = PoissonRV(testMean, stream = Data.rvTestStream).sample(sampleSize)
         val dist = Poisson(estimatedMeanR)
-        val test = GofFactory().discreteTest(ChiSquareRequest(), data, dist)
+        val test = GofFactory().discreteTest(ChiSquareRequest(ChiSquareRequest.automaticBinsDiscrete(data)), data, dist)
         assert(KSLMath.equal(test.testScore, chiSquareValueR, precision = precision))
             { "Chi square value should be $chiSquareValueR, was ${test.testScore}" }
         assert(KSLMath.equal(test.testScore, chiSquareValueR, precision = precision))

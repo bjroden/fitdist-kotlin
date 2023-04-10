@@ -43,9 +43,8 @@ public class GofFactory {
         ): ChiSquareGofTest
         where T: DistributionIfc<*>,
               T: ContinuousDistributionIfc {
-            val bins = request.breakPoints ?: automaticBinsContinuous(data)
-            val observedCounts = countObservedContinuous(data, bins)
-            val expectedCounts = countExpectedContinuous(data.size, dist, bins)
+            val observedCounts = countObservedContinuous(data, request.breakPoints)
+            val expectedCounts = countExpectedContinuous(data.size, dist, request.breakPoints)
             val positiveExpectedCounts = expectedCounts.indices.filter { expectedCounts[it] > 0 }
             val expectedPositive = expectedCounts.sliceArray(positiveExpectedCounts)
             val observedPositive = observedCounts.sliceArray(positiveExpectedCounts)
@@ -60,9 +59,8 @@ public class GofFactory {
         where T: DistributionIfc<*>,
               T: DiscreteDistributionIfc {
             require(data.all { floor(it) == it }) { "Data input cannot contain non-integer data" }
-            val bins = request.breakPoints ?: automaticBinsDiscrete(data)
-            val observedCounts = countObservedDiscrete(data, bins)
-            val expectedCounts = countExpectedDiscrete(data.size, dist, bins)
+            val observedCounts = countObservedDiscrete(data, request.breakPoints)
+            val expectedCounts = countExpectedDiscrete(data.size, dist, request.breakPoints)
             val positiveExpectedCounts = expectedCounts.indices.filter { expectedCounts[it] > 0 }
             val expectedPositive = expectedCounts.sliceArray(positiveExpectedCounts)
             val observedPositive = observedCounts.sliceArray(positiveExpectedCounts)
@@ -98,13 +96,6 @@ public class GofFactory {
             }.toDoubleArray()
             return doubleArrayOf(underflow, *middle, overflow)
         }
-
-        private fun automaticBinsContinuous(data: DoubleArray) = Histogram.recommendBreakPoints(data)
-
-        private fun automaticBinsDiscrete(data: DoubleArray) =
-            (0..data.max().toInt())
-                .map { it.toDouble() }
-                .toDoubleArray()
 
         private fun makeKs(data: DoubleArray, dist: ContinuousDistributionIfc): KolmogorovSmirnovGofTest {
             val cdfs = data.sortedArray().map { dist.cdf(it) }.toDoubleArray()
