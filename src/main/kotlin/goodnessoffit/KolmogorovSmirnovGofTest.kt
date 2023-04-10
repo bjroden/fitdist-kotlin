@@ -11,6 +11,7 @@ public class KolmogorovSmirnovGofTest(
 
     override val testScore: Double
     override val pValue: Double
+    override val universalScore: Double
     override val warnings: Set<KSWarning>
 
     init {
@@ -23,6 +24,7 @@ public class KolmogorovSmirnovGofTest(
         val dMinus = cdfs.mapIndexed { i, value -> value - (i / n) }.max()
         testScore = max(dPlus, dMinus)
         pValue = 1 - KolmogorovSmirnovTest().cdf(testScore, nInt)
+        universalScore = pValue
         warnings = KSWarning.values().filter { warning ->
             when (warning) {
                 KSWarning.TIED_VALUES -> !KSLArrays.isAllDifferent(cdfs)
