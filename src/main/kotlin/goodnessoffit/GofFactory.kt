@@ -53,6 +53,7 @@ public class GofFactory {
 
             val intervals = expected.size
             val degreesOfFreedom = intervals - 1 - parameterCount
+            require(degreesOfFreedom > 0) { "Degrees of freedom must be > 0" }
             val longObserved = observed.map { it.toLong() }.toLongArray()
             val testScore = ChiSquareTest().chiSquare(expected, longObserved)
             val pValue = 1 - ChiSquaredDistribution(degreesOfFreedom.toDouble()).cumulativeProbability(testScore)
