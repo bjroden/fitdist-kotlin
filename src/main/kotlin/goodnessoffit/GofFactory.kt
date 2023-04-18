@@ -1,8 +1,14 @@
 package goodnessoffit
 
+import estimations.allNonnegative
+import ksl.utilities.KSLArrays
 import ksl.utilities.distributions.*
 import ksl.utilities.statistic.Histogram
+import org.apache.commons.math3.distribution.ChiSquaredDistribution
+import org.apache.commons.math3.stat.inference.ChiSquareTest
+import org.apache.commons.math3.stat.inference.KolmogorovSmirnovTest
 import kotlin.math.floor
+import kotlin.math.max
 
 public class GofFactory {
     public fun <T, D> continuousTest(
@@ -34,8 +40,52 @@ public class GofFactory {
         } as T
     }
 
-
     private companion object {
+        private fun makeChiSquareFromArrays(
+            expected: DoubleArray,
+            observed: DoubleArray,
+            parameterCount: Int
+        ): ChiSquareGofTest {
+            require(expected.size == observed.size) { "Expected and observed arrays must be same size" }
+            require(expected.size >= 2) { "Expected and observed array length must be >= 2" }
+            require(allNonnegative(expected) && allNonnegative(observed))
+                { "Expected and observed arrays must be non-negative" }
+
+            val intervals = expected.size
+            val degreesOfFreedom = intervals - 1 - parameterCount
+            val longObserved = observed.map { it.toLong() }.toLongArray()
+            val testScore = ChiSquareTest().chiSquare(expected, longObserved)
+            val pValue = 1 - ChiSquaredDistribution(degreesOfFreedom.toDouble()).cumulativeProbability(testScore)
+            val universalScore = pValue
+            val warnings = ChiSquareWarning.values().filter { warning ->
+                when (warning) {
+                    ChiSquareWarning.SMALL_EXPECTED_COUNTS -> expected.count { it <= 5 } >= 0.2 * expected.size
+                }
+            }.toSet()
+            return ChiSquareGofTest(
+                testScore, pValue, universalScore, warnings, degreesOfFreedom, intervals
+            )
+        }
+
+        private fun makeKSTestFromCdfs(cdfs: DoubleArray): KolmogorovSmirnovGofTest {
+            require(cdfs.size >= 2) { "Array length must be >= 2" }
+            require(cdfs.all { it in 0.0..1.0 }) { "K-S cdf values must be in [0,1]" }
+
+            val nInt = cdfs.size
+            val n = nInt.toDouble()
+            val dPlus = cdfs.mapIndexed { i, value -> ((i + 1) / n) - value }.max()
+            val dMinus = cdfs.mapIndexed { i, value -> value - (i / n) }.max()
+            val testScore = max(dPlus, dMinus)
+            val pValue = 1 - KolmogorovSmirnovTest().cdf(testScore, nInt)
+            val universalScore = pValue
+            val warnings = KSWarning.values().filter { warning ->
+                when (warning) {
+                    KSWarning.TIED_VALUES -> !KSLArrays.isAllDifferent(cdfs)
+                }
+            }.toSet()
+            return KolmogorovSmirnovGofTest(testScore, pValue, universalScore, warnings)
+        }
+
         private fun <T> makeChiSquareContinuous(
             data: DoubleArray,
             dist: T,
@@ -48,7 +98,7 @@ public class GofFactory {
             val positiveExpectedCounts = expectedCounts.indices.filter { expectedCounts[it] > 0 }
             val expectedPositive = expectedCounts.sliceArray(positiveExpectedCounts)
             val observedPositive = observedCounts.sliceArray(positiveExpectedCounts)
-            return ChiSquareGofTest(expectedPositive, observedPositive, dist.parameters().size)
+            return makeChiSquareFromArrays(expectedPositive, observedPositive, dist.parameters().size)
         }
 
         private fun <T> makeChiSquareDiscrete(
@@ -64,7 +114,7 @@ public class GofFactory {
             val positiveExpectedCounts = expectedCounts.indices.filter { expectedCounts[it] > 0 }
             val expectedPositive = expectedCounts.sliceArray(positiveExpectedCounts)
             val observedPositive = observedCounts.sliceArray(positiveExpectedCounts)
-            return ChiSquareGofTest(expectedPositive, observedPositive, dist.parameters().size)
+            return makeChiSquareFromArrays(expectedPositive, observedPositive, dist.parameters().size)
         }
 
         private fun countObservedDiscrete(data: DoubleArray, bins: DoubleArray): DoubleArray {
@@ -99,7 +149,7 @@ public class GofFactory {
 
         private fun makeKs(data: DoubleArray, dist: ContinuousDistributionIfc): KolmogorovSmirnovGofTest {
             val cdfs = data.sortedArray().map { dist.cdf(it) }.toDoubleArray()
-            return KolmogorovSmirnovGofTest(cdfs)
+            return makeKSTestFromCdfs(cdfs)
         }
     }
 }
