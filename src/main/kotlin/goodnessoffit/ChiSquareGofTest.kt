@@ -9,7 +9,13 @@ public data class ChiSquareGofTest(
     public val intervals: Int
 ) : AbstractGofTest(), PValueIfc
 
+/**
+ * Warnings specific to the chi-square test
+ */
 public enum class ChiSquareWarning : WarningIfc {
+    /**
+     * Present when >20% of intervals have less than 5 expected values
+     */
     SMALL_EXPECTED_COUNTS {
         override val message: String
             get() = ">20% of intervals had less than 5 expected values"

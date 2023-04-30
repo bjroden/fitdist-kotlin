@@ -13,16 +13,35 @@ import kotlin.math.floor
 import kotlin.math.ln
 
 public class NegativeBinomialParameters(public var maxEvaluations: Int = 1000) : ParameterEstimatorIfc {
+    /**
+     * Estimate only probSuccess from known numSuccesses
+     * @param [data] Input data. Must be non-negative integers.
+     * @param [numSuccesses] Known numSuccesses value.
+     * @return The probability of success
+     */
     public fun estimateProbSuccess(data: DoubleArray, numSuccesses: Double): Result<Double> {
         if (numSuccesses <= 0) { return estimateFailure("NumSuccesses must be > 0") }
         return checkValidity(data).map { probFromNum(numSuccesses, Statistic(data).average) }
     }
 
+    /**
+     * Estimate only numSuccesses from a known probSuccess.
+     * @param [data] Input data. Must be non-negative integers.
+     * @param [probSuccess] Known success probability.
+     * @return The numSuccesses value
+     */
     public fun estimateNumSuccesses(data: DoubleArray, probSuccess: Double): Result<Double> {
         if (probSuccess <= 0 || probSuccess >= 1) { return estimateFailure("ProbSuccess must be in (0,1)") }
         return checkValidity(data).map { numFromProb(probSuccess, Statistic(data).average) }
     }
 
+    /**
+     * Estimate the parameters for a negative binomial distribution.
+     * Data must be non-negative integers.
+     * Returns parameters in the form `[probSuccesses, numSuccesses`].
+     * @param [data] Input data. Must be non-negative integers.
+     * @return Array containing `[probSuccesses, numSuccesses`]
+     */
     override fun estimate(data: DoubleArray): Result<DoubleArray> {
         checkValidity(data).onFailure { return Result.failure(it) }
         val intData = data.map { it.toInt() }.toIntArray()

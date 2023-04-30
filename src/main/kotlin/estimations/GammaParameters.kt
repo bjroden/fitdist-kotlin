@@ -10,6 +10,12 @@ import org.apache.commons.numbers.gamma.Digamma
 import kotlin.math.ln
 
 public class GammaParameters : ParameterEstimatorIfc {
+    /**
+     * Estimate the parameters for a gamma distribution
+     * Returns parameters in the form `[shape, scale`].
+     * @param [data] Input data.
+     * @return Array containing `[shape, scale`]
+     */
     override fun estimate(data: DoubleArray): Result<DoubleArray> {
         if (data.any { it <= 0 }) { return estimateFailure("Data must be positive") }
         val solver = BisectionRootFinder(

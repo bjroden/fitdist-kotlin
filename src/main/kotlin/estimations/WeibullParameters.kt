@@ -4,7 +4,12 @@ import kotlin.math.ln
 import kotlin.math.pow
 
 public class WeibullParameters : ParameterEstimatorIfc {
-    //TODO: replace sumOf with more computationally stable method (and maybe pow if needed)
+    /**
+     * Estimate the parameters for a weibull distribution.
+     * Returns parameters in the form `[alpha, beta`].
+     * @param [data] Input data.
+     * @return Array containing `[alpha, beta`]
+     */
     override fun estimate(data: DoubleArray): Result<DoubleArray> {
         if (data.any { it <= 0 }) { return estimateFailure("Data must be positive") }
         var alpha = getAlpha0(data)

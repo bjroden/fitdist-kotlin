@@ -10,7 +10,18 @@ import org.apache.commons.math3.stat.inference.KolmogorovSmirnovTest
 import kotlin.math.floor
 import kotlin.math.max
 
+/**
+ * Factory to perform goodness of fit tests on input data
+ */
 public class GofFactory {
+    /**
+     * Perform a test for continuous data
+     * @param [request] The desired type of goodness of fit test
+     * @param [data] The input data
+     * @param [dist] A continuous distribution
+     * @return The results of a goodness of fit test.
+     * Return type is a subclass of AbstractGofTest that corresponds to the request variable.
+     */
     public fun <T, D> continuousTest(
         request: ContinuousRequest<T>,
         data: DoubleArray,
@@ -26,6 +37,14 @@ public class GofFactory {
         } as T
     }
 
+    /**
+     * Perform a test for discrete data
+     * @param [request] The desired type of goodness of fit test
+     * @param [data] The input data
+     * @param [dist] A continuous distribution
+     * @return The results of a goodness of fit test.
+     * Return type is a subclass of AbstractGofTest that corresponds to the request variable.
+     */
     public fun <T, D> discreteTest(
         request: DiscreteRequest<T>,
         data: DoubleArray,

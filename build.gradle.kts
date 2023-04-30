@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     `java-library`
     kotlin("jvm") version "1.7.21"
+    id("org.jetbrains.dokka") version "1.8.10"
 }
 
 group = "org.example"
@@ -29,4 +30,8 @@ tasks.withType<KotlinCompile> {
 
 kotlin {
     explicitApi()
+}
+
+subprojects {
+    apply(plugin = "org.jetbrains.dokka")
 }

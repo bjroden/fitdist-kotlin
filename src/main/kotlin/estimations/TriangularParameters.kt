@@ -3,6 +3,12 @@ package estimations
 import ksl.utilities.statistic.Statistic
 
 public class TriangularParameters : ParameterEstimatorIfc {
+    /**
+     * Estimate the parameters for a triangular distribution.
+     * Returns parameters in the form `[min, mode, max`].
+     * @param [data] Input data.
+     * @return Array containing `[min, mode, max`]
+     */
     override fun estimate(data: DoubleArray): Result<DoubleArray> {
         if (data.isEmpty()) {
             return estimateFailure("Provided data array is empty")
