@@ -1,5 +1,8 @@
 package goodnessoffit
 
+/**
+ * Stores results of a chi-square test.
+ */
 public data class ChiSquareGofTest(
     override val testScore: Double,
     override val pValue: Double,

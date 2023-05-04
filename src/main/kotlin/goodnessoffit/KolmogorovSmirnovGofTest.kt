@@ -1,5 +1,8 @@
 package goodnessoffit
 
+/**
+ * Stores results of a Kolmogorov-Smirnov test.
+ */
 public data class KolmogorovSmirnovGofTest(
     override val testScore: Double,
     override val pValue: Double,

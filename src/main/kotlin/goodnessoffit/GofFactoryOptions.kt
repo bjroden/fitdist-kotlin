@@ -22,7 +22,20 @@ public sealed interface DiscreteRequest <T: AbstractGofTest> : GofRequest<T>
  * Request a chi-square goodness of fit test
  */
 public class ChiSquareRequest(
-    // TODO: documentation for this, with differences between continuous and discrete tests
+    /**
+     * Breakpoints used for chi-square intervals. Must be strictly increasing.
+     *
+     * If used for a continuous test, intervals will be created from the breakpoints,
+     * and an extra interval will be created from negative infinity to the lowest breakpoint value,
+     * as well as an extra interval from the highest breakpoint value to positive infinity.
+     * For example, if breakPoints = `[0, 2, 4`], the intervals will be
+     * `[-∞..0, 0..2, 2..4, 4..∞`].
+     *
+     * If used for a discrete test, intervals will be based on the frequency counts for each value
+     * in the breakpoints array. If there is a gap greater than 1 between two breakPoint values, these
+     * will be combined into one interval. For example, the breakPoints `[0, 2, 3`] will give intervals
+     * `[0, 1..2, 3`]. If the lowest value is not zero, the first interval will be from 0 to that value.
+     */
     public val breakPoints: DoubleArray
 ): ContinuousRequest<ChiSquareGofTest>, DiscreteRequest<ChiSquareGofTest> {
     public companion object {
