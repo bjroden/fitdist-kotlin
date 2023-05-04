@@ -79,7 +79,7 @@ public class GofFactory {
             val universalScore = pValue
             val warnings = ChiSquareWarning.values().filter { warning ->
                 when (warning) {
-                    ChiSquareWarning.SMALL_EXPECTED_COUNTS -> expected.count { it <= 5 } >= 0.2 * expected.size
+                    ChiSquareWarning.SMALL_EXPECTED_COUNTS -> expected.count { it < 5 } > 0.2 * expected.size
                 }
             }.toSet()
             return ChiSquareGofTest(
