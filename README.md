@@ -8,6 +8,10 @@ goodness-of-fit tests, ranking goodness-of-fit tests on a common scale, and
 creating data needed for visual representations such as P-P plots and Q-Q 
 plots.
 
+The API uses the [Kotlin Simulation Library](https://github.com/rossetti/KSL)
+for the distribution classes that are necessary for all of the above 
+functionality.
+
 ## Running
 
 This project uses the [gradle](https://gradle.org/) build system. If you have
